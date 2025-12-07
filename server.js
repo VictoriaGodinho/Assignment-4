@@ -1,64 +1,59 @@
 import express from "express";
-
 import expressWs from "express-ws";
 
-// Create a server
 const server = express();
-// Added websocket features
 expressWs(server);
 
-const port = 3000;
+const port = 3005;
 
 let clients = {};
-
-let messages = [];
-
 let global_id = 0;
 
-// Set up a websocket endpoint
+let carrots = []; // now stores ALL plants + messages
+
 server.ws("/", (client) => {
-  // Figure out the client's id
   let id = global_id++;
 
-  console.log(`${id} connected`)
+  console.log(`${id} connected`);
 
   send(client, {
     type: "welcome",
     id,
-    connected: Object.keys(clients),
-    messages,
+    carrots,
   });
-
-  broadcast({ type: "connected", id });
 
   clients[id] = client;
 
   client.on("message", (dataString) => {
-    let event = JSON.parse(dataString);
+    const event = JSON.parse(dataString);
 
-    if (event.type === "client_message") {
-      let { content } = event;
+    if (event.type === "plant") {
+      const veggie = {
+        x: event.x,
+        y: event.y,
+        src: event.src,
+        message: event.message,
+        sender: id,
+      };
 
-      let message = { content, time: Date.now(), sender: id };
-
-      messages.push(message);
+      carrots.push(veggie);
 
       broadcast({
-        type: "server_message",
-        ...message,
+        type: "planted",
+        carrot: veggie,
       });
     }
   });
 
   client.on("close", () => {
-    console.log(`${id} disconnected`)
+    console.log(`${id} disconnected`);
     delete clients[id];
-    broadcast({ type: "disconnected", id });
   });
 });
 
-// Start the server
-server.listen(port, "0.0.0.0", () => {});
+server.listen(port, "0.0.0.0", () => {
+  console.log(`WebSocket server running at ws://localhost:${port}`);
+});
 
 function send(client, message) {
   client.send(JSON.stringify(message));
@@ -69,3 +64,4 @@ function broadcast(message) {
     send(client, message);
   }
 }
+
