@@ -4,6 +4,53 @@
     <meta charset="utf-8" />
     <title>Chat Application</title>
     <script src="client/main.jsx" type="module"></script>
+    <style>
+      html, body, #root {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+       background: url("/garden.png") no-repeat center center fixed;
+       background-size: cover;
+       font-family: 'Inter', sans-serif;
+
+      }
+
+      #root {
+        display: flex;
+      }
+
+      .users {
+        margin-right: 20px;
+      }
+
+      #chat {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      #chat #messages {
+        flex: 1;
+        overflow-y: scroll;
+      }
+      
+      .message {
+        width: auto;
+        justify-self: start;
+      }
+
+      .message.local {
+        width: auto;
+        justify-self: end;
+      }
+
+      .message p {
+        padding: 20px;
+        background: #eee;
+      }
+    </style>
   </head>
   <body>
     <section id="root"></section>
